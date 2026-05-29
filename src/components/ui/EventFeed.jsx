@@ -5,7 +5,7 @@ import { UserPlus, MessageCircle } from "lucide-react"
 export default function EventFeed({ events = [] }) {
   if (events.length === 0) {
     return (
-      <div className="flex items-center justify-center h-full text-sm text-zinc-600">
+      <div className="flex items-center justify-center h-full text-sm text-[var(--text-muted)]">
         Waiting for events…
       </div>
     )
@@ -23,13 +23,13 @@ export default function EventFeed({ events = [] }) {
         return (
           <div
             key={i}
-            className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 px-4 py-3 backdrop-blur"
+            className="glass group/event flex items-start gap-3 rounded-xl px-4 py-3 transition-all duration-200 hover:border-[var(--border-light)]"
           >
             <span
               className={`mt-0.5 flex h-7 w-7 items-center justify-center rounded-full ${
                 isFollow
-                  ? "bg-violet-500/20 text-violet-400"
-                  : "bg-emerald-500/20 text-emerald-400"
+                  ? "bg-[var(--accent)]/20 text-[var(--accent)]"
+                  : "bg-[var(--success)]/20 text-[var(--success)]"
               }`}
             >
               {isFollow ? (
@@ -39,17 +39,17 @@ export default function EventFeed({ events = [] }) {
               )}
             </span>
             <div className="flex-1 min-w-0">
-              <p className="truncate text-sm font-semibold text-white">
+              <p className="truncate text-sm font-semibold text-[var(--text-primary)]">
                 {ev.user}
               </p>
               {ev.message && (
-                <p className="truncate text-xs text-zinc-400">{ev.message}</p>
+                <p className="truncate text-xs text-[var(--text-secondary)]">{ev.message}</p>
               )}
               {isFollow && (
-                <p className="text-xs text-violet-400">New follower</p>
+                <p className="text-xs text-[var(--accent)]">New follower</p>
               )}
             </div>
-            <span className="shrink-0 text-[11px] text-zinc-600">{time}</span>
+            <span className="shrink-0 text-[11px] text-[var(--text-muted)]">{time}</span>
           </div>
         )
       })}

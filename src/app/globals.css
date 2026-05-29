@@ -4,7 +4,80 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
+:root {
+  --bg-primary: #0e0e10;
+  --bg-secondary: #18181b;
+  --bg-card: rgba(30, 30, 35, 0.7);
+  --bg-card-solid: rgba(30, 30, 35, 0.55);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-light: rgba(255, 255, 255, 0.14);
+  --text-primary: #efeff1;
+  --text-secondary: #adadb8;
+  --text-muted: #848494;
+  --accent: #9147ff;
+  --accent-glow: rgba(145, 71, 255, 0.2);
+  --success: #00c805;
+  --danger: #eb0400;
+  --header-bg: rgba(14, 14, 16, 0.8);
+  --glow-violet: rgba(145, 71, 255, 0.06);
+  --glow-emerald: rgba(0, 200, 5, 0.04);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+
+[data-theme="light"] {
+  --bg-primary: #f7f7f8;
+  --bg-secondary: #ffffff;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-solid: rgba(255, 255, 255, 0.75);
+  --border: rgba(0, 0, 0, 0.07);
+  --border-light: rgba(0, 0, 0, 0.12);
+  --text-primary: #1f1f23;
+  --text-secondary: #53535f;
+  --text-muted: #848494;
+  --accent: #9147ff;
+  --accent-glow: rgba(145, 71, 255, 0.1);
+  --success: #00c805;
+  --danger: #eb0400;
+  --header-bg: rgba(247, 247, 248, 0.9);
+  --glow-violet: rgba(145, 71, 255, 0.03);
+  --glow-emerald: rgba(0, 200, 5, 0.02);
+  scrollbar-color: rgba(0,0,0,0.15) transparent;
+}
+
 * {
   scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
+}
+
+::selection {
+  background: var(--accent-glow);
+  color: var(--text-primary);
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(12px, -8px) scale(1.02); }
+  66% { transform: translate(-8px, 6px) scale(0.98); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { r: 3; opacity: 1; }
+  50% { r: 5; opacity: 0.6; }
+}
+
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--border);
+}
+
+.glass-hover:hover {
+  border-color: var(--border-light);
+  box-shadow: 0 0 0 1px var(--border-light), 0 4px 24px -4px rgba(0,0,0,0.3);
 }

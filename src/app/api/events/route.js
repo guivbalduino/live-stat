@@ -1,7 +1,12 @@
 export const dynamic = "force-dynamic"
 
-const isMock =
-  !process.env.TWITCH_CLIENT_ID || !process.env.TWITCH_CLIENT_SECRET
+function isMockMode() {
+  const override = globalThis.__twitchBeamMock ?? null
+  const hasCredentials = !!(
+    process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET
+  )
+  return override === true || (!hasCredentials && override !== false)
+}
 
 const mockNames = [
   "StreamCraft", "PixelPirate", "NeonNova", "VoidWalker", "ArcaneAce",
@@ -42,10 +47,12 @@ function generateMockEvent(prevViewers) {
 
 export async function GET(req) {
   const encoder = new TextEncoder()
+  const mock = isMockMode()
+  let prevNotesVersion = -1
 
   const stream = new ReadableStream({
     start(controller) {
-      let viewerCount = 42 + Math.floor(Math.random() * 80)
+      let viewerCount = mock ? 42 + Math.floor(Math.random() * 80) : 0
 
       const send = (data) => {
         try {
@@ -55,13 +62,25 @@ export async function GET(req) {
         }
       }
 
-      send({ type: "connected", mock: isMock, timestamp: Date.now() })
+      send({ type: "connected", mock, timestamp: Date.now() })
 
       const interval = setInterval(() => {
-        const event = generateMockEvent(viewerCount)
-        viewerCount = event.viewerCount ?? viewerCount
-        send(event)
-      }, isMock ? 2500 : 5000)
+        const notesVersion = globalThis.__twitchBeamNotesVersion ?? 0
+        if (notesVersion !== prevNotesVersion) {
+          prevNotesVersion = notesVersion
+          send({
+            type: "notes_sync",
+            notes: globalThis.__twitchBeamNotes ?? [],
+            version: notesVersion,
+          })
+        }
+
+        if (mock) {
+          const event = generateMockEvent(viewerCount)
+          viewerCount = event.viewerCount ?? viewerCount
+          send(event)
+        }
+      }, 2500)
 
       req.signal.addEventListener("abort", () => {
         clearInterval(interval)
