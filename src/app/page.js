@@ -5,6 +5,7 @@ import { Eye, Heart, Activity, EyeOff, Shuffle, Volume2, VolumeX, TrendingUp } f
 import MetricCard from "@/components/ui/MetricCard"
 import EventFeed from "@/components/ui/EventFeed"
 import StreamStatus from "@/components/ui/StreamStatus"
+import StreamSummary from "@/components/ui/StreamSummary"
 import StreamNotes from "@/components/ui/StreamNotes"
 import TwitchChat from "@/components/ui/TwitchChat"
 import ThemeToggle from "@/components/ui/ThemeToggle"
@@ -55,7 +56,11 @@ export default function DashboardPage() {
           setStatus(data)
           setMockBadge(data.mock)
           setTotalFollowers(data.followerCount ?? 0)
-          if (data.isLive) setViewers(data.viewerCount)
+          if (data.isLive && data.viewerCount != null) {
+            setViewers(data.viewerCount)
+            chartRef.current = [...chartRef.current.slice(-59), { t: Date.now(), v: data.viewerCount }]
+            setChartData(chartRef.current)
+          }
 
           if (!data.mock) {
             const streamId = data.startedAt
@@ -221,6 +226,22 @@ export default function DashboardPage() {
           />
         )}
 
+        {!status.isLive && status.offlineImageUrl && (
+          <div className="relative aspect-video rounded-2xl overflow-hidden lg:hidden">
+            <img
+              src={status.offlineImageUrl}
+              alt="Stream offline"
+              className="h-full w-full object-cover opacity-60"
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <div className="text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Offline</p>
+                <p className="mt-1 text-sm text-white/50">Be right back</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-3">
           <div className="flex flex-col gap-4 lg:col-span-2">
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -246,7 +267,27 @@ export default function DashboardPage() {
             </div>
 
             <div className="h-44">
-              <ViewersChart data={chartData} />
+              {status.isLive ? (
+                <ViewersChart data={chartData} />
+              ) : status.offlineImageUrl ? (
+                <div className="relative h-full rounded-2xl overflow-hidden glass">
+                  <img
+                    src={status.offlineImageUrl}
+                    alt="Stream offline"
+                    className="h-full w-full object-cover opacity-60"
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                    <div className="text-center">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Offline</p>
+                      <p className="mt-1 text-sm text-white/50">Be right back</p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center rounded-2xl glass text-sm text-[var(--text-muted)]">
+                  Stream is offline
+                </div>
+              )}
             </div>
 
             <div className="glass flex-1 rounded-2xl p-5 flex flex-col overflow-hidden transition-all duration-300">
@@ -263,6 +304,7 @@ export default function DashboardPage() {
             <div className="flex-1 min-h-0">
               <TwitchChat channel={status.broadcasterName} />
             </div>
+            {!status.isLive && <StreamSummary lastVod={status.lastVod} lastSession={status.lastSession} />}
             <StreamNotes />
           </div>
         </div>
